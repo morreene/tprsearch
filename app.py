@@ -6,7 +6,6 @@ from flask import Flask, request, redirect, url_for, flash, session, render_temp
 
 import pandas as pd
 import openai
-import pandas as pd
 from openai.embeddings_utils import get_embedding, cosine_similarity
 
 import webbrowser
@@ -32,9 +31,6 @@ def search_docs(df, user_query, threshold=0.8):
     return res
 
 # Load the data
-df = pd.read_csv("data/my_data.csv")
-# tpr = pd.read_parquet(r'data/tpr_embedding_for_dash_app_openai_ada_v2.parquet')
-# tpr = pd.read_feather(r'data/tpr_embedding_for_dash_app_openai_ada_v2.feather')
 tpr = pd.read_pickle(r'data/tpr_embedding_for_dash_app_openai_ada_v2.pickle')
 
 # Flask app
@@ -43,7 +39,6 @@ app.secret_key = 'your-secret-key'
 
 # Define the Dash app
 dash_app = dash.Dash(__name__, server=app, url_base_pathname='/dashboard/', suppress_callback_exceptions=True, external_stylesheets=[dbc.themes.BOOTSTRAP])
-# external_stylesheets = ['https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css']
 
 users = {'wto': 'wto', 'w': 'w'}
 
@@ -196,7 +191,7 @@ index_page = html.Div([
     ),
     html.Br(),
     html.Br(),
-    
+
     dbc.Row([
         html.Br(),
         html.Br(),
@@ -210,21 +205,19 @@ index_page = html.Div([
         dbc.Col(
                 dbc.InputGroup([
                         dbc.Input(id="search-box", type="text", placeholder="Enter search query, e.g. subsidies and government support to fossil feul and energy", ),
-                        dbc.Button(" Search ", id="search-button", 
+                        dbc.Button(" Search ", id="search-button", n_clicks=0,
                                         #    className="btn btn-primary mt-3", 
-                                        n_clicks=0),
+                                    ),
                     ]
                 ), width=6,
             ),
         ], justify="center", className="header", id='search-container'
     ),
 
-
     dbc.Row([
         dbc.Col([
                     html.Label("Return results with similarity score between:", className="text-end")
-                ], width=2, style={'text-align':'right', 'margin-top':'15px'}, 
-            # className="align-self-right"
+                ], width=2, style={'text-align':'right', 'margin-top':'15px'},   # className="align-self-right"
             ),
         dbc.Col([
             dcc.RangeSlider(
@@ -232,7 +225,7 @@ index_page = html.Div([
                 min=0.5,
                 max=1,
                 step=0.1,
-                value=[0.7, 1],
+                value=[0.8, 1],
                 marks={
                     0.5: '0.5',
                     0.6: '0.6',
@@ -240,8 +233,7 @@ index_page = html.Div([
                     0.8: '0.8',
                     0.9: '0.9',
                     1: '1'
-                },
-                # className="mx-0 px-0"  # Remove margin/padding
+                }, # className="mx-0 px-0"  # Remove margin/padding
             )
         ], width=2,style={'margin-top':'20px'},)
     ],justify="center", ),
@@ -263,7 +255,7 @@ index_page = html.Div([
                 * interdictions d'importer ou d'exporter
                 * Πολιτικές που ευνοούν τις μικρές επιχειρήσεις
 
-                Based on reports issued after 2015 for 119 Members
+                The search is based on 119 TPR reports issued since 2015.
                 '''
                 ),
         ], width=5),
@@ -292,39 +284,25 @@ index_page = html.Div([
         )
 def search(n_clicks, search_terms, threshold):
     # Check if the search button was clicked
-    # if n_clicks is None:
-    #     return None
     if n_clicks <=0 or search_terms=='' or search_terms is None:
         return "", {'display': 'block'}, None
 
     # Search the dataframe for matching rows
     if search_terms:
-        # matches = df[df.apply(lambda row: search_terms in str(row), axis=1)]
-
         matches = search_docs(tpr, search_terms, threshold= threshold[0])
-        # matches = tpr.head(200)
-        # matches['similarities']=0.8569125155
         matches['similarities'] = matches['similarities'].round(3)
         matches['text'] = matches['ParaID'] + ' ' + matches['text']
-
         matches = matches[['Symbol','ReportMemberName','IssuingDate','Topic', 'text','similarities']]
         matches.columns = ['Symbol','Member','Date','Section/Topic','Text (Paragraph)','Score']
-
     else:
-        matches = df
+        matches = None
 
     # Display the results in a datatable
     return dbc.Container([
             dash_table.DataTable(
-                    # id='tab',
-                    # columns=[
-                    #     {"name": i, "id": i, "deletable": False, "selectable": False} for i in dff.columns if i != 'ID'
-                    # ],
-                    # data = dff.to_dict('records'),
                     id="search-results-table",
                     columns=[{"name": col, "id": col} for col in matches.columns],
                     data=matches.to_dict("records"),
-
 
                     editable=False,
                     filter_action="native",
@@ -392,14 +370,6 @@ def search(n_clicks, search_terms, threshold):
 def update_slider(value):
     return [value[0], 1]
 
-
-
-
-
-
-
-
-
 # toggle offcanvas help
 @dash_app.callback(
     Output("offcanvas", "is_open"),
@@ -412,9 +382,6 @@ def toggle_offcanvas(n1, is_open):
     if n1:
         return not is_open
     return is_open
-
-
-
 
 
 @dash_app.callback(Output('dummy-output', 'children'), [Input('logout-button', 'n_clicks')])
@@ -432,16 +399,10 @@ dash_app.layout = serve_layout
 
 
 
-
-
-
-
 # original
 if __name__ == '__main__':
     app.run(debug=True)
     # app.run_server(debug=True)
-
-
 
 # # for pyinstaller
 # def open_browser():
@@ -450,8 +411,3 @@ if __name__ == '__main__':
 # if __name__ == '__main__':
 #     Timer(1, open_browser).start();
 #     dash_app.run_server(debug=False, port=5000)
-
-
-
-
-
