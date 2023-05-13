@@ -12,7 +12,6 @@ from openai.embeddings_utils import get_embedding, cosine_similarity
 import webbrowser
 from threading import Timer
 
-
 API_KEY = "3842bbdef12e406dbaf407d7a133ee7e"
 RESOURCE_ENDPOINT = "https://openai-mais.openai.azure.com/"
 
@@ -21,9 +20,7 @@ openai.api_key = API_KEY
 openai.api_base = RESOURCE_ENDPOINT
 openai.api_version = "2022-12-01"
 
-
-
-# search docs with openai embedding
+# function search document data with openai embedding
 def search_docs(df, user_query, top_n=3, to_print=False):
     embedding = get_embedding(
         user_query,
@@ -38,8 +35,6 @@ def search_docs(df, user_query, top_n=3, to_print=False):
     if to_print:
         print(res)
     return res
-
-
 
 
 
@@ -152,7 +147,7 @@ def before_request():
 
 
 #################################################
-# Start the function page
+# Start the functional page
 #################################################
 
 index_page = html.Div([
@@ -191,7 +186,7 @@ index_page = html.Div([
                                     You can use English, French, Spanish, Arabic, German and other languages.                                    
                                 '''
                                 ),
-                    ],
+                        ],
                         id="offcanvas",
                         backdrop=True,
                         title="Understanding Search Based on Text Embeddings",
@@ -203,7 +198,7 @@ index_page = html.Div([
             dbc.NavItem(dbc.NavLink("Logout", href="#", id='logout-button')),
             html.Div(id='dummy-output'),  # Dummy output to trigger the callback
         ],
-        brand="TPR Reports - AI-Powered Search",
+        brand="AI-Powered Search on WTO TPR Reports",
         brand_href="/dashboard/",
         color="primary",
         dark=True,
@@ -221,17 +216,75 @@ index_page = html.Div([
     ], justify="center", id='top-space'),
 
     dbc.Row([
-            dbc.Col(
-                    dbc.InputGroup([
-                            dbc.Input(id="search-box", type="text", placeholder="Enter search query, e.g. subsidies and government support to fossil feul and energy", ),
-                            dbc.Button(" Search ", id="search-button", 
-                                            #    className="btn btn-primary mt-3", 
-                                            n_clicks=0),
-                    
-                    ]
-                ), width=6,
-            ),
+        dbc.Col(
+                dbc.InputGroup([
+                        dbc.Input(id="search-box", type="text", placeholder="Enter search query, e.g. subsidies and government support to fossil feul and energy", ),
+                        dbc.Button(" Search ", id="search-button", 
+                                        #    className="btn btn-primary mt-3", 
+                                        n_clicks=0),
+                
+                ]
+            ), width=6,
+        ),
     ], justify="center", className="header", id='search-container'),
+
+
+
+
+
+
+
+
+
+
+    dbc.Row([
+        dbc.Col([
+            html.Label("Return results with similarity score:", className="text-end", 
+                    #    style={'paddingRight': '10px'}
+                       )
+        ], width=2, 
+        style={'text-align':'right', 'margin-top':'15px'}, 
+        # className="align-self-right"
+        ),
+        dbc.Col([
+            dcc.RangeSlider(
+                id='my-range-slider',
+                min=0.5,
+                max=1,
+                step=0.1,
+                value=[0.7, 1],
+                marks={
+                    0.5: '0.5',
+                    0.6: '0.6',
+                    0.7: '0.7',
+                    0.8: '0.8',
+                    0.9: '0.9',
+
+                    1: '1'
+                },
+                # className="mx-0 px-0"  # Remove margin/padding
+                
+            )
+        ], width=2,style={'margin-top':'20px'},)
+    ],justify="center", ),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     html.Br(),
     html.Br(),
@@ -241,24 +294,21 @@ index_page = html.Div([
 
             dcc.Markdown(
                 '''
-                Based on reports issued after 2015 for 119 Members
-
-                Search query examples:
+                Be clear and specific when crafting your query. There's no need to worry about whether the words or phrases will exactly match the text you want to find. 
+                You can use English, French, Spanish, Arabic, German and other languages. Search query examples:
                 * subsidies and government supports on fossil fuel and energy
-                * الإعانات والدعم الحكومي للوقود الأحفوري والطاقة
-                * interdictions d'importer ou d'exporter
-                * Πολιτικές που ευνοούν τις μικρές επιχειρήσεις
                 * find policies related to MSME, SME or small businesses in Africa
                 * any competition policy related to high-tech sector
                 * quantatitive restrictions (with typo)
                 * policies supporting ecommerce
+                * الإعانات والدعم الحكومي للوقود الأحفوري والطاقة
+                * interdictions d'importer ou d'exporter
+                * Πολιτικές που ευνοούν τις μικρές επιχειρήσεις
 
-                    
+                Based on reports issued after 2015 for 119 Members
+    
                 '''
                 ),
-
-
-
         ], width=5),
     ], justify="center", className="header", id='sample-queries'),
 
@@ -374,6 +424,22 @@ def search(n_clicks, search_terms):
 #################################################
 # end of function page
 #################################################
+
+
+# range slider
+@dash_app.callback(
+    Output('my-range-slider', 'value'),
+    Input('my-range-slider', 'value')
+)
+def update_slider(value):
+    return [value[0], 1]
+
+
+
+
+
+
+
 
 
 # toggle offcanvas help
