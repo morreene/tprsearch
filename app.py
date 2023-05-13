@@ -399,15 +399,15 @@ dash_app.layout = serve_layout
 
 
 
-# original
-if __name__ == '__main__':
-    app.run(debug=True)
-    # app.run_server(debug=True)
-
-# # for pyinstaller
-# def open_browser():
-# 	webbrowser.open_new("http://localhost:{}/dashboard/".format(5000))
-
+# # original
 # if __name__ == '__main__':
-#     Timer(1, open_browser).start();
-#     dash_app.run_server(debug=False, port=5000)
+#     app.run(debug=True)
+#     # app.run_server(debug=True)
+
+# for pyinstaller
+def open_browser():
+	webbrowser.open_new("http://localhost:{}/dashboard/".format(5000))
+
+if __name__ == '__main__':
+    Timer(1, open_browser).start();
+    dash_app.run_server(debug=False, port=5000)
