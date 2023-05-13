@@ -44,7 +44,7 @@ def search_docs(df, user_query, top_n=3, to_print=False):
 
 
 # Load the data
-# df = pd.read_csv("data/my_data.csv")
+df = pd.read_csv("data/my_data.csv")
 # tpr = pd.read_parquet(r'data/tpr_embedding_for_dash_app_openai_ada_v2.parquet')
 # tpr = pd.read_feather(r'data/tpr_embedding_for_dash_app_openai_ada_v2.feather')
 tpr = pd.read_pickle(r'data/tpr_embedding_for_dash_app_openai_ada_v2.pickle')
