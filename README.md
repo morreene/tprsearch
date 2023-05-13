@@ -1,6 +1,6 @@
-"# tprsearch" 
+# tprsearch 
 
-
+```
 # build docker image
 docker build -t searchtpr_app .
 # run docker
@@ -12,3 +12,4 @@ docker save -o searchtpr_app.tar searchtpr_app
 # copy tar to another computer
 # load to another computer
 docker load -i searchtpr_app.tar
+```
