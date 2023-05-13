@@ -194,9 +194,7 @@ index_page = html.Div([
         color="primary",
         dark=True,
     ),
-    html.Br(),
-    html.Br(),
-    
+
     dbc.Row([
         html.Br(),
         html.Br(),
@@ -295,7 +293,7 @@ def search(n_clicks, search_terms, threshold):
     # if n_clicks is None:
     #     return None
     if n_clicks <=0 or search_terms=='' or search_terms is None:
-        return "", {'display': 'block'}, None
+        return "", {'display': 'block'}
 
     # Search the dataframe for matching rows
     if search_terms:

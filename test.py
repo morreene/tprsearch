@@ -1,52 +1,38 @@
+import pandas as pd
 import dash
 import dash_bootstrap_components as dbc
-from dash import dcc, html
-from dash.dependencies import Input, Output
+import dash_html_components as html
+from dash.dependencies import Input, Output, State
+
+# Create a DataFrame with some dummy data
+df = pd.DataFrame({
+    'Name': ['Alice', 'Bob', 'Charlie', 'David'],
+    'Age': [24, 30, 35, 19],
+    'City': ['New York', 'Los Angeles', 'Chicago', 'Houston']
+})
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 app.layout = dbc.Container([
-    dbc.Row([
-        dbc.Col([
-            html.Label("Select value:", className="text-end", style={'paddingRight': '10px'})
-        ], width=2, className="align-self-center"),
-        dbc.Col([
-            dcc.RangeSlider(
-                id='my-range-slider',
-                min=0.5,
-                max=1,
-                step=0.1,
-                value=[0.7, 1],
-                marks={
-                    0.5: '0.5',
-                    0.6: '0.6',
-                    0.7: '0.7',
-                    0.8: '0.8',
-                    0.9: '0.9',
-
-                    1: '1'
-                },
-                className="mx-0 px-0"  # Remove margin/padding
-            )
-        ], width=10)
-    ]),
-    html.Div(id='slider-output-container')
+    dbc.Input(id="input", placeholder="Type something...", type="text"),
+    dbc.Button("Search", id='button', n_clicks=0),
+    html.Div(id='output-container-button', children='Enter a name and press "Search"')
 ])
 
 @app.callback(
-    Output('slider-output-container', 'children'),
-    Input('my-range-slider', 'value')
+    Output('output-container-button', 'children'),
+    Input('button', 'n_clicks'),
+    State('input', 'value')
 )
-def update_output(value):
-    selected_range = [round(i / 10, 1) for i in range(int(value[0] * 10), 11)]
-    return 'You have selected: {}'.format(value[0])
+def update_output(n_clicks, value):
+    if n_clicks > 0:
+        results = df[df['Name'] == value]
+        if results.empty:
+            return 'No results found'
+        else:
+            return results.to_dict('records')
+    else:
+        return 'Enter a name and press "Search"'
 
-@app.callback(
-    Output('my-range-slider', 'value'),
-    Input('my-range-slider', 'value')
-)
-def update_slider(value):
-    return [value[0], 1]
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run_server(debug=True)
