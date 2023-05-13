@@ -415,8 +415,6 @@ dash_app.layout = serve_layout
 
 
 
-
-
 # original
 if __name__ == '__main__':
     app.run(debug=True)
